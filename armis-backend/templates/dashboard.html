@@ -1,23 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ARMIS Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <title>ARMIS Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #001f3f;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #003366;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .container {
+            padding: 20px;
+        }
+        .sensor-box {
+            background-color: #00264d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
 </head>
-<body class="dashboard">
-  <h1>ARMIS Dashboard</h1>
-  <div id="cards">
-    <div class="card"><h3>Temperature</h3><p id="temp">--</p></div>
-    <div class="card"><h3>Humidity</h3><p id="humidity">--</p></div>
-    <div class="card"><h3>Rain</h3><p id="rain">--</p></div>
-    <div class="card"><h3>Soil</h3><p id="soil">--</p></div>
-    <div class="card"><h3>GPS</h3><p id="gps">--</p></div>
-  </div>
+<body>
+    <header>ARMIS Dashboard</header>
+    <div class="container">
+        <div class="sensor-box">
+            <strong>Temperature:</strong> <span id="temp">Loading...</span><br>
+            <strong>Humidity:</strong> <span id="humidity">Loading...</span><br>
+            <strong>Rain:</strong> <span id="rain">Loading...</span><br>
+            <strong>Soil:</strong> <span id="soil">Loading...</span><br>
+            <strong>GPS:</strong> <span id="gps">Loading...</span>
+        </div>
 
-  <canvas id="tempChart" width="400" height="200"></canvas>
-  <canvas id="humChart" width="400" height="200"></canvas>
+        <canvas id="tempChart" width="600" height="200"></canvas>
+        <canvas id="humidityChart" width="600" height="200"></canvas>
+        <canvas id="rainChart" width="600" height="200"></canvas>
+        <canvas id="soilChart" width="600" height="200"></canvas>
+    </div>
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const tempEl = document.getElementById('temp');
+        const humidityEl = document.getElementById('humidity');
+        const rainEl = document.getElementById('rain');
+        const soilEl = document.getElementById('soil');
+        const gpsEl = document.getElementById('gps');
+
+        const tempChart = new Chart(document.getElementById('tempChart'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Temperature °C', data: [], borderColor: 'red', fill: false }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: '°C' } } } }
+        });
+
+        const humidityChart = new Chart(document.getElementById('humidityChart'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Humidity %', data: [], borderColor: 'blue', fill: false }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: '%' } } } }
+        });
+
+        const rainChart = new Chart(document.getElementById('rainChart'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Rain', data: [], borderColor: 'green', fill: false }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Rain Status' } } } }
+        });
+
+        const soilChart = new Chart(document.getElementById('soilChart'), {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: 'Soil', data: [], borderColor: 'orange', fill: false }] },
+            options: { responsive: true, scales: { x: { title: { display: true, text: 'Time' } }, y: { title: { display: true, text: 'Soil Status' } } } }
+        });
+
+        function fetchData() {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    tempEl.textContent = data.Temp || 'N/A';
+                    humidityEl.textContent = data.Humidity || 'N/A';
+                    rainEl.textContent = data.Rain || 'N/A';
+                    soilEl.textContent = data.Soil || 'N/A';
+                    gpsEl.textContent = data.GPS || 'N/A';
+
+                    const timeLabel = new Date().toLocaleTimeString();
+
+                    function updateChart(chart, value) {
+                        chart.data.labels.push(timeLabel);
+                        chart.data.datasets[0].data.push(value);
+                        if (chart.data.labels.length > 20) {
+                            chart.data.labels.shift();
+                            chart.data.datasets[0].data.shift();
+                        }
+                        chart.update();
+                    }
+
+                    if (data.Temp) updateChart(tempChart, parseFloat(data.Temp));
+                    if (data.Humidity) updateChart(humidityChart, parseFloat(data.Humidity));
+                    if (data.Rain) updateChart(rainChart, parseFloat(data.Rain.split('→')[0]));
+                    if (data.Soil) updateChart(soilChart, parseFloat(data.Soil.split('→')[0]));
+                })
+                .catch(err => console.error('Error fetching data:', err));
+        }
+
+        setInterval(fetchData, 2000); // fetch every 2 seconds
+        fetchData(); // initial fetch
+    </script>
 </body>
 </html>

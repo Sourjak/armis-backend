@@ -1,0 +1,48 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #0a1931;
+  color: white;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.login-page .login-box {
+  margin: 100px auto;
+  padding: 20px;
+  width: 300px;
+  background: #1b2a49;
+  border-radius: 10px;
+}
+
+input, button {
+  margin: 5px 0;
+  padding: 10px;
+  width: 90%;
+  border: none;
+  border-radius: 5px;
+}
+
+button {
+  background: #185adb;
+  color: white;
+  cursor: pointer;
+}
+
+.error { color: red; }
+
+.dashboard h1 { margin: 20px; }
+
+#cards {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #1b2a49;
+  padding: 15px;
+  margin: 10px;
+  border-radius: 10px;
+  width: 150px;
+}

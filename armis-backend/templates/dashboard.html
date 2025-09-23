@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ARMIS Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard">
+  <h1>ARMIS Dashboard</h1>
+  <div id="cards">
+    <div class="card"><h3>Temperature</h3><p id="temp">--</p></div>
+    <div class="card"><h3>Humidity</h3><p id="humidity">--</p></div>
+    <div class="card"><h3>Rain</h3><p id="rain">--</p></div>
+    <div class="card"><h3>Soil</h3><p id="soil">--</p></div>
+    <div class="card"><h3>GPS</h3><p id="gps">--</p></div>
+  </div>
+
+  <canvas id="tempChart" width="400" height="200"></canvas>
+  <canvas id="humChart" width="400" height="200"></canvas>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

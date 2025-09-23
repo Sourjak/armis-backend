@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_cors import CORS
-import smtplib, ssl, os, time
+import smtplib, ssl, os
 
 app = Flask(__name__)
 CORS(app)
@@ -33,9 +33,12 @@ def send_alert(subject, body):
 
 # Chief Engine thresholds
 def check_triggers(data):
-    temp = float(data.get("temperature", 0))
-    soil = data.get("soil", "").lower()
-    rain = data.get("rain", "").lower()
+    try:
+        temp = float(data.get("Temp", "0").replace(" °C", ""))
+    except:
+        temp = 0
+    soil = data.get("Soil", "").lower()
+    rain = data.get("Rain", "").lower()
 
     if temp > 35:
         send_alert("🔥 High Temperature Alert", f"Temperature reached {temp} °C")
@@ -44,12 +47,19 @@ def check_triggers(data):
     if "rain" in rain and "no" not in rain:
         send_alert("🌧️ Rain Alert", f"Rain status: {rain}")
 
+# -----------------------------
+# API Endpoints
+# -----------------------------
+
 # Upload endpoint (Arduino → Backend)
 @app.route("/upload", methods=["POST"])
 def upload_data():
     global latest_data
     data = request.json
-    latest_data = data
+    if not data:
+        return jsonify({"status": "error", "message": "No data received"}), 400
+
+    latest_data.update(data)
     check_triggers(data)
     return jsonify({"status": "ok", "received": data})
 
@@ -76,4 +86,5 @@ def dashboard():
     return render_template("dashboard.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    # Use port 10000 for Render deployment
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))

@@ -34,7 +34,7 @@ def send_alert(subject, body):
 # Chief Engine thresholds
 def check_triggers(data):
     try:
-        temp = float(data.get("Temp", "0").replace(" °C", ""))
+        temp = float(data.get("Temp", "0").replace("°C","").strip())
     except:
         temp = 0
     soil = data.get("Soil", "").lower()
@@ -47,10 +47,6 @@ def check_triggers(data):
     if "rain" in rain and "no" not in rain:
         send_alert("🌧️ Rain Alert", f"Rain status: {rain}")
 
-# -----------------------------
-# API Endpoints
-# -----------------------------
-
 # Upload endpoint (Arduino → Backend)
 @app.route("/upload", methods=["POST"])
 def upload_data():
@@ -59,9 +55,10 @@ def upload_data():
     if not data:
         return jsonify({"status": "error", "message": "No data received"}), 400
 
+    # Merge incoming data with existing latest_data
     latest_data.update(data)
-    check_triggers(data)
-    return jsonify({"status": "ok", "received": data})
+    check_triggers(latest_data)  # Check triggers using merged data
+    return jsonify({"status": "ok", "received": latest_data})
 
 # Data endpoint (Frontend fetches this)
 @app.route("/data", methods=["GET"])
@@ -86,5 +83,4 @@ def dashboard():
     return render_template("dashboard.html")
 
 if __name__ == "__main__":
-    # Use port 10000 for Render deployment
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    app.run(host="0.0.0.0", port=5000)

@@ -1,19 +1,165 @@
-body{font-family:Arial,sans-serif;background:#f0f2f5;color:#333;margin:0;padding:0;}
-header{background:#001f4d;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;}
-header h1{margin:0;}
-nav a{color:white;text-decoration:none;margin-left:20px;font-weight:bold;}
-nav a:hover{text-decoration:underline;}
-main{padding:20px;}
-.data-container p{font-size:18px;margin:5px 0;}
-#charts, #risk-chart{margin-top:30px;}
-canvas{max-width:600px;margin:20px 0;}
-#trigger-alert{margin-top:20px;padding:10px 20px;background:#001f4d;color:white;border:none;cursor:pointer;font-size:16px;}
-#trigger-alert:hover{background:#003366;}
-#trigger-log ul{list-style:none;padding:0;}
-#trigger-log li{padding:5px 0;border-bottom:1px solid #ccc;}
-.login-container{width:350px;margin:100px auto;background:white;padding:30px;border-radius:8px;box-shadow:0 0 15px rgba(0,0,0,0.2);}
-.login-container h1{text-align:center;margin-bottom:20px;}
-.login-container input{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:5px;}
-.login-container button{width:100%;padding:10px;background:#001f4d;color:white;border:none;border-radius:5px;font-size:16px;cursor:pointer;}
-.login-container button:hover{background:#003366;}
-.error{color:red;text-align:center;}
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body Styling */
+body {
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Header Styling */
+header {
+    background-color: #001f4d; /* Navy blue */
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.8rem;
+}
+
+header nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content Styling */
+main {
+    padding: 20px;
+}
+
+/* Card / Section Styling */
+section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Dashboard live data container */
+.data-container p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+/* Chart Canvas Styling */
+canvas {
+    max-width: 100%;
+    height: 300px;
+    margin-top: 15px;
+}
+
+/* Login Page */
+.login-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.login-container h1 {
+    margin-bottom: 20px;
+    color: #001f4d;
+}
+
+.login-container input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-container button {
+    width: 95%;
+    padding: 10px;
+    background-color: #001f4d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.login-container button:hover {
+    background-color: #003366;
+}
+
+.error {
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Risk Analysis Page */
+#risk-summary p, #trigger-log ul, #risk-chart canvas {
+    margin-top: 10px;
+}
+
+/* Trigger Button */
+#trigger-alert {
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color: #001f4d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#trigger-alert:hover {
+    background-color: #003366;
+}
+
+/* Trigger Log List */
+#log-list {
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-left: 0;
+}
+
+#log-list li {
+    background-color: #e6ecf8;
+    margin-bottom: 5px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    header nav {
+        margin-top: 10px;
+    }
+
+    .login-container {
+        margin: 40px 10px;
+        padding: 20px;
+    }
+}

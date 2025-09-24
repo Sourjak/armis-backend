@@ -1,48 +1,73 @@
 body {
-  font-family: Arial, sans-serif;
-  background-color: #0a1931;
-  color: white;
-  margin: 0;
-  padding: 0;
-  text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
 }
 
-.login-page .login-box {
-  margin: 100px auto;
-  padding: 20px;
-  width: 300px;
-  background: #1b2a49;
-  border-radius: 10px;
+header {
+    background-color: #001f4d;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-input, button {
-  margin: 5px 0;
-  padding: 10px;
-  width: 90%;
-  border: none;
-  border-radius: 5px;
+header h1 {
+    margin: 0;
 }
 
-button {
-  background: #185adb;
-  color: white;
-  cursor: pointer;
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
 }
 
-.error { color: red; }
-
-.dashboard h1 { margin: 20px; }
-
-#cards {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+nav a:hover {
+    text-decoration: underline;
 }
 
-.card {
-  background: #1b2a49;
-  padding: 15px;
-  margin: 10px;
-  border-radius: 10px;
-  width: 150px;
+main {
+    padding: 20px;
+}
+
+.data-container p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+#charts, #risk-chart {
+    margin-top: 30px;
+}
+
+canvas {
+    max-width: 600px;
+    margin: 20px 0;
+}
+
+#trigger-alert {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #001f4d;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#trigger-alert:hover {
+    background-color: #003366;
+}
+
+#trigger-log ul {
+    list-style: none;
+    padding: 0;
+}
+
+#trigger-log li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ccc;
 }

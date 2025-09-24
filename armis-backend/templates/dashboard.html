@@ -14,78 +14,62 @@
             <a href="{{ url_for('risk_analysis') }}">Risk Analysis</a>
         </nav>
     </header>
-
     <main>
         <section id="live-data">
-            <h2>Live Data</h2>
-            <div class="data-cards">
-                <div class="card">Temperature: <span id="temp">--</span></div>
-                <div class="card">Humidity: <span id="humidity">--</span></div>
-                <div class="card">Rain: <span id="rain">--</span></div>
-                <div class="card">Soil: <span id="soil">--</span></div>
-                <div class="card">GPS: <span id="gps">--</span></div>
+            <h2>Live Sensor Data</h2>
+            <div class="data-container">
+                <p>Temperature: <span id="temp">--</span></p>
+                <p>Humidity: <span id="humidity">--</span></p>
+                <p>Soil: <span id="soil">--</span></p>
+                <p>Rain: <span id="rain">--</span></p>
+                <p>GPS: <span id="gps">--</span></p>
             </div>
         </section>
-
-        <section id="graphs">
+        <section id="charts">
+            <h2>Graphs</h2>
             <canvas id="tempChart"></canvas>
             <canvas id="humidityChart"></canvas>
         </section>
     </main>
 
-    <script>
-        let tempData = [];
-        let humidityData = [];
-        let labels = [];
+<script>
+const tempData = [];
+const humidityData = [];
+const timeLabels = [];
+const tempCtx = document.getElementById('tempChart').getContext('2d');
+const humidityCtx = document.getElementById('humidityChart').getContext('2d');
 
-        const tempChartCtx = document.getElementById('tempChart').getContext('2d');
-        const humidityChartCtx = document.getElementById('humidityChart').getContext('2d');
+const tempChart = new Chart(tempCtx, {
+    type: 'line',
+    data: { labels: timeLabels, datasets: [{ label: 'Temperature (°C)', data: tempData, borderColor: 'red', fill: false }] },
+    options: { responsive: true }
+});
+const humidityChart = new Chart(humidityCtx, {
+    type: 'line',
+    data: { labels: timeLabels, datasets: [{ label: 'Humidity (%)', data: humidityData, borderColor: 'blue', fill: false }] },
+    options: { responsive: true }
+});
 
-        const tempChart = new Chart(tempChartCtx, {
-            type: 'line',
-            data: { labels, datasets: [{ label: 'Temperature (°C)', data: tempData, borderColor: 'red', tension: 0.3 }] },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
-        const humidityChart = new Chart(humidityChartCtx, {
-            type: 'line',
-            data: { labels, datasets: [{ label: 'Humidity (%)', data: humidityData, borderColor: 'blue', tension: 0.3 }] },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
-        async function fetchData() {
-            try {
-                const response = await fetch('/data');
-                const data = await response.json();
-                
-                if (!data.message) {
-                    document.getElementById('temp').innerText = data.Temp || '--';
-                    document.getElementById('humidity').innerText = data.Humidity || '--';
-                    document.getElementById('rain').innerText = data.Rain || '--';
-                    document.getElementById('soil').innerText = data.Soil || '--';
-                    document.getElementById('gps').innerText = data.GPS || '--';
-
-                    const timeLabel = new Date().toLocaleTimeString();
-                    labels.push(timeLabel);
-                    tempData.push(parseFloat(data.Temp) || 0);
-                    humidityData.push(parseFloat(data.Humidity) || 0);
-
-                    if (labels.length > 20) {
-                        labels.shift();
-                        tempData.shift();
-                        humidityData.shift();
-                    }
-
-                    tempChart.update();
-                    humidityChart.update();
-                }
-            } catch (err) {
-                console.error("Error fetching data:", err);
-            }
-        }
-
-        setInterval(fetchData, 2000);
-        fetchData();
-    </script>
+async function fetchData() {
+    try {
+        const res = await fetch('/data');
+        const data = await res.json();
+        if (data.Temp) document.getElementById('temp').innerText = data.Temp;
+        if (data.Humidity) document.getElementById('humidity').innerText = data.Humidity;
+        if (data.Soil) document.getElementById('soil').innerText = data.Soil;
+        if (data.Rain) document.getElementById('rain').innerText = data.Rain;
+        if (data.GPS) document.getElementById('gps').innerText = data.GPS;
+        const now = new Date().toLocaleTimeString();
+        timeLabels.push(now);
+        tempData.push(parseFloat(data.Temp) || 0);
+        humidityData.push(parseFloat(data.Humidity) || 0);
+        if (timeLabels.length > 10) { timeLabels.shift(); tempData.shift(); humidityData.shift(); }
+        tempChart.update();
+        humidityChart.update();
+    } catch(err) { console.error(err); }
+}
+setInterval(fetchData, 2000);
+fetchData();
+</script>
 </body>
 </html>

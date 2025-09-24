@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ARMIS Risk Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>ARMIS Risk Analysis</h1>
+        <nav>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('risk_analysis') }}">Risk Analysis</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="risk-summary">
+            <h2>Risk Probability</h2>
+            <canvas id="riskChart"></canvas>
+            <p>Main contributing factor: <span id="mainFactor">--</span></p>
+        </section>
+
+        <section id="trigger-log">
+            <h2>Trigger Log</h2>
+            <ul id="logList">
+                <li>No triggers yet</li>
+            </ul>
+        </section>
+    </main>
+
+    <script>
+        const riskCtx = document.getElementById('riskChart').getContext('2d');
+        const riskChart = new Chart(riskCtx, {
+            type: 'doughnut',
+            data: { labels: ['Low Risk', 'Moderate Risk', 'High Risk'], datasets: [{ data: [30, 40, 30], backgroundColor: ['#4caf50','#ff9800','#f44336'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        function updateMainFactor(factor) {
+            document.getElementById('mainFactor').innerText = factor;
+        }
+
+        function addTriggerLog(entry) {
+            const logList = document.getElementById('logList');
+            if (logList.firstChild.textContent === "No triggers yet") logList.innerHTML = "";
+            const li = document.createElement('li');
+            li.textContent = entry;
+            logList.appendChild(li);
+        }
+
+        // Simulate triggers (for testing)
+        setTimeout(() => addTriggerLog("🔥 High Temperature Alert triggered"), 3000);
+        setTimeout(() => updateMainFactor("Temperature"), 3000);
+    </script>
+</body>
+</html>

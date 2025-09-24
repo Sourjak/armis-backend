@@ -7,52 +7,78 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <h1>ARMIS Risk Analysis</h1>
-        <nav>
-            <a href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('risk_analysis') }}">Risk Analysis</a>
-        </nav>
-    </header>
+<header>
+    <h1>ARMIS Risk Analysis</h1>
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('risk_analysis') }}">Risk Analysis</a>
+    </nav>
+</header>
+<main>
+    <section id="risk-summary">
+        <h2>Current Risk</h2>
+        <p>Risk Probability: <span id="risk-prob">--</span>%</p>
+        <p>Most Responsible Factor: <span id="risk-factor">--</span></p>
+    </section>
+    <section id="trigger-log">
+        <h2>Trigger Log</h2>
+        <ul id="log-list"></ul>
+    </section>
+    <section id="risk-chart">
+        <h2>Risk Analysis Chart</h2>
+        <canvas id="riskChart"></canvas>
+    </section>
+    <button id="trigger-alert">Trigger Alert</button>
+</main>
 
-    <main>
-        <section id="risk-summary">
-            <h2>Risk Probability</h2>
-            <canvas id="riskChart"></canvas>
-            <p>Main contributing factor: <span id="mainFactor">--</span></p>
-        </section>
+<script>
+const logList = document.getElementById('log-list');
+const riskProb = document.getElementById('risk-prob');
+const riskFactor = document.getElementById('risk-factor');
 
-        <section id="trigger-log">
-            <h2>Trigger Log</h2>
-            <ul id="logList">
-                <li>No triggers yet</li>
-            </ul>
-        </section>
-    </main>
+const ctx = document.getElementById('riskChart').getContext('2d');
+const riskChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: ['Temperature','Soil','Rain'], datasets: [{ label: 'Risk (%)', data: [0,0,0], backgroundColor:['red','green','blue'] }] },
+    options: { responsive:true }
+});
 
-    <script>
-        const riskCtx = document.getElementById('riskChart').getContext('2d');
-        const riskChart = new Chart(riskCtx, {
-            type: 'doughnut',
-            data: { labels: ['Low Risk', 'Moderate Risk', 'High Risk'], datasets: [{ data: [30, 40, 30], backgroundColor: ['#4caf50','#ff9800','#f44336'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+async function fetchRiskData(){
+    try{
+        const res = await fetch('/data');
+        const data = await res.json();
+        const temp = parseFloat(data.Temp)||0;
+        const soilDry = data.Soil && data.Soil.toLowerCase().includes('dry')?1:0;
+        const rain = data.Rain && data.Rain.toLowerCase().includes('no')?0:1;
+        const riskTemp = temp>35?50:temp>30?30:10;
+        const riskSoil = soilDry?30:10;
+        const riskRain = rain?20:5;
+        const totalRisk = Math.min(riskTemp+riskSoil+riskRain,100);
+        riskProb.innerText=totalRisk;
+        riskFactor.innerText = riskTemp>=riskSoil && riskTemp>=riskRain?'Temperature': riskSoil>=riskTemp && riskSoil>=riskRain?'Soil':'Rain';
+        riskChart.data.datasets[0].data = [riskTemp,riskSoil,riskRain];
+        riskChart.update();
+        const logItem = document.createElement('li');
+        logItem.innerText = `${new Date().toLocaleTimeString()} - Risk updated: ${totalRisk}%`;
+        logList.prepend(logItem);
+        if(logList.children.length>10) logList.removeChild(logList.lastChild);
+    }catch(err){console.error(err);}
+}
 
-        function updateMainFactor(factor) {
-            document.getElementById('mainFactor').innerText = factor;
-        }
+document.getElementById('trigger-alert').addEventListener('click',async()=>{
+    try{
+        const res = await fetch('/data');
+        const data = await res.json();
+        alert(`Trigger Alert sent!\nTemp: ${data.Temp}\nSoil: ${data.Soil}\nRain: ${data.Rain}`);
+        const logItem = document.createElement('li');
+        logItem.innerText=`${new Date().toLocaleTimeString()} - Trigger manually sent`;
+        logList.prepend(logItem);
+        if(logList.children.length>10) logList.removeChild(logList.lastChild);
+    }catch(err){console.error(err);}
+});
 
-        function addTriggerLog(entry) {
-            const logList = document.getElementById('logList');
-            if (logList.firstChild.textContent === "No triggers yet") logList.innerHTML = "";
-            const li = document.createElement('li');
-            li.textContent = entry;
-            logList.appendChild(li);
-        }
-
-        // Simulate triggers (for testing)
-        setTimeout(() => addTriggerLog("🔥 High Temperature Alert triggered"), 3000);
-        setTimeout(() => updateMainFactor("Temperature"), 3000);
-    </script>
+setInterval(fetchRiskData,3000);
+fetchRiskData();
+</script>
 </body>
 </html>
